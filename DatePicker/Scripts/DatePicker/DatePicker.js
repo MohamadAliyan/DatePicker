@@ -1,147 +1,175 @@
-﻿/// <reference path="../jquery.d.ts" />
-/// <reference path="../../globalize/globalize.d.ts" />
-// TODO: create a method for set date
+﻿// TODO: create a method for set date
 // TODO: create a method for hiding
 // TODO: create a method for showing
-
-module DatePicker {
+var DatePicker;
+(function (DatePicker) {
     (function ($) {
-        $.fn.datePicker = function (options?: Options) {
+        $.fn.datePicker = function (options) {
             //...
-            return this.each(function () {  // maintain chainability
+            return this.each(function () {
                 var $this = $(this);
                 var widget;
                 if (options) {
                     if (options.dateFormat)
                         widget = new Widget($this, new Model(Globalize.culture(), options.dateFormat), options);
-                }
-                else
+                } else
                     widget = new Widget($this, new Model(Globalize.culture()), options);
                 widget.init();
                 return widget;
                 //...
             });
-
         };
     })(jQuery);
 
-    export interface Options {
-        onSelect: (dateText: string) => void;
-        dateFormat: string;
-        //PickerBtnQuery: JQuery;
-    }
-
-    export class Day {
-        isOld: boolean;
-        isNew: boolean;
-        value: string;
-        isActive: boolean;
-        isToday: boolean;
-        isDisabled: boolean;
-    }
-
-    export class Month {
-        isActive: boolean;
-        isDisabled: boolean;
-        value: string;
-    }
-
-    export class Year {
-        isActive: boolean;
-        isDisabled: boolean;
-        value: string;
-    }
-
-    export class Model {
-        viewMode: number;
-        get yearMonthHeader() {
-            return this.viewingYear + " " + Globalize.culture().calendars.standard.months.namesAbbr[this.viewingMonth - 1];
+    var Day = (function () {
+        function Day() {
         }
-        get yearHeader() { return this.viewingYear; }
+        return Day;
+    })();
+    DatePicker.Day = Day;
 
-        get decadeHeader() { return (this.viewingDecade - 1).toString() + " - " + (this.viewingDecade + 1); }
+    var Month = (function () {
+        function Month() {
+        }
+        return Month;
+    })();
+    DatePicker.Month = Month;
 
-        get dayViewDays() {
-            var days = new Array(42);
-            if (!Globalize.culture().calendars.standard.convert)
-                var firstDayOfMonthDow = new Date(this.viewingYear, this.viewingMonth - 1, 1).getDay();
-            else
-                var firstDayOfMonthDow = <number>(Globalize.culture().calendars.standard.convert.toGregorian(this.viewingYear, this.viewingMonth - 1, 1).getDay());
-            var firstDayIndex = (firstDayOfMonthDow + 7 - Globalize.culture().calendars.standard.firstDay) % 7;
-            for (var i = 0; i < 42; i++) {
-                var day = new Day();
+    var Year = (function () {
+        function Year() {
+        }
+        return Year;
+    })();
+    DatePicker.Year = Year;
+
+    var Model = (function () {
+        function Model(culture, dateFormat) {
+            this.culture = culture;
+            this.dateFormat = dateFormat;
+            var date = new Date();
+            this.selectedYear = this.viewingYear = parseInt(Globalize.format(date, "yyyy"));
+            this.selectedMonth = this.viewingMonth = parseInt(Globalize.format(date, "MM"));
+            this.selectedDay = parseInt(Globalize.format(date, "dd"));
+            this.viewingDecade = this.viewingYear - (this.viewingYear % 10);
+            this.viewMode = 1;
+        }
+        Object.defineProperty(Model.prototype, "yearMonthHeader", {
+            get: function () {
+                return this.viewingYear + " " + Globalize.culture().calendars.standard.months.namesAbbr[this.viewingMonth - 1];
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Model.prototype, "yearHeader", {
+            get: function () {
+                return this.viewingYear;
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(Model.prototype, "decadeHeader", {
+            get: function () {
+                return (this.viewingDecade - 1).toString() + " - " + (this.viewingDecade + 1);
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Object.defineProperty(Model.prototype, "dayViewDays", {
+            get: function () {
+                var days = new Array(42);
                 if (!Globalize.culture().calendars.standard.convert)
-                    var curDate = new Date(this.viewingYear, this.viewingMonth - 1, i - firstDayIndex + 1);
+                    var firstDayOfMonthDow = new Date(this.viewingYear, this.viewingMonth - 1, 1).getDay();
                 else
-                    var curDate = <Date>Globalize.culture().calendars.standard.convert.toGregorian(this.viewingYear, this.viewingMonth - 1, i - firstDayIndex + 1);
-                day.value = parseInt(Globalize.format(curDate, "dd")).toString();
-                if (i - firstDayIndex + 1 <= 0)
-                    day.isOld = true;
-                if (parseInt(Globalize.format(curDate, "MM")) > this.viewingMonth)
-                    day.isNew = true;
-                if (this.selectedYear === this.viewingYear && this.selectedMonth === this.viewingMonth && this.selectedDay === i - firstDayIndex + 1)
-                    day.isActive = true;
-                var today = new Date();
-                if (curDate.getDate() == today.getDate() && curDate.getFullYear() == today.getFullYear() && curDate.getMonth() == today.getMonth())
-                    day.isToday = true;
-                days[i] = day;
-            }
-
-            var rows = new Array();
-            for (var i = 0; i < 6; i++) {
-                var week = new Array();
-                for (var j = 0; j < 7; j++) {
-                    week.push(days[(i * 7) + j]);
+                    var firstDayOfMonthDow = (Globalize.culture().calendars.standard.convert.toGregorian(this.viewingYear, this.viewingMonth - 1, 1).getDay());
+                var firstDayIndex = (firstDayOfMonthDow + 7 - Globalize.culture().calendars.standard.firstDay) % 7;
+                for (var i = 0; i < 42; i++) {
+                    var day = new Day();
+                    if (!Globalize.culture().calendars.standard.convert)
+                        var curDate = new Date(this.viewingYear, this.viewingMonth - 1, i - firstDayIndex + 1);
+                    else
+                        var curDate = Globalize.culture().calendars.standard.convert.toGregorian(this.viewingYear, this.viewingMonth - 1, i - firstDayIndex + 1);
+                    day.value = parseInt(Globalize.format(curDate, "dd")).toString();
+                    if (i - firstDayIndex + 1 <= 0)
+                        day.isOld = true;
+                    var m = parseInt(Globalize.format(curDate, "MM"));
+                    if (m > this.viewingMonth || (m == 1 && this.viewingMonth == 12))
+                        day.isNew = true;
+                    if (this.selectedYear === this.viewingYear && this.selectedMonth === this.viewingMonth && this.selectedDay === i - firstDayIndex + 1)
+                        day.isActive = true;
+                    var today = new Date();
+                    if (curDate.getDate() == today.getDate() && curDate.getFullYear() == today.getFullYear() && curDate.getMonth() == today.getMonth())
+                        day.isToday = true;
+                    days[i] = day;
                 }
-                rows.push(week);
-            }
-            return rows;
-        }
 
-        getDayOfMonth(week, dayOfWeek): number {
+                var rows = new Array();
+                for (var i = 0; i < 6; i++) {
+                    var week = new Array();
+                    for (var j = 0; j < 7; j++) {
+                        week.push(days[(i * 7) + j]);
+                    }
+                    rows.push(week);
+                }
+                return rows;
+            },
+            enumerable: true,
+            configurable: true
+        });
+
+        Model.prototype.getDayOfMonth = function (week, dayOfWeek) {
             return 0;
-        }
+        };
 
-        get monthViewMonths() {
-            var months = new Array();
-            for (var i = 0; i < 12; i++) {
-                var m = new Month();
-                m.value = Globalize.culture().calendars.standard.months.namesAbbr[i];
-                m.isActive = i + 1 == this.selectedMonth;
-                months.push(m);
-            }
-            return months;
-        }
+        Object.defineProperty(Model.prototype, "monthViewMonths", {
+            get: function () {
+                var months = new Array();
+                for (var i = 0; i < 12; i++) {
+                    var m = new Month();
+                    m.value = Globalize.culture().calendars.standard.months.namesAbbr[i];
+                    m.isActive = i + 1 == this.selectedMonth;
+                    months.push(m);
+                }
+                return months;
+            },
+            enumerable: true,
+            configurable: true
+        });
 
-        get yearViewYears() {
-            var years = new Array();
-            for (var i = this.viewingDecade - 1; i <= this.viewingDecade + 11; i++) {
-                var y = new Year();
-                y.value = i.toString();
-                y.isActive = i == this.selectedYear;
-                years.push(y);
-            }
-            return years;
-        }
+        Object.defineProperty(Model.prototype, "yearViewYears", {
+            get: function () {
+                var years = new Array();
+                for (var i = this.viewingDecade - 1; i <= this.viewingDecade + 11; i++) {
+                    var y = new Year();
+                    y.value = i.toString();
+                    y.isActive = i == this.selectedYear;
+                    years.push(y);
+                }
+                return years;
+            },
+            enumerable: true,
+            configurable: true
+        });
 
-        selectedYear: number;
-        selectedMonth: number;
-        selectedDay: number;
+        Object.defineProperty(Model.prototype, "selectedDate", {
+            get: function () {
+                if (this.selectedDay == null && this.selectedMonth == null && this.selectedYear == null)
+                    return null;
+                if (Globalize.culture().calendars.standard.convert)
+                    var d = Globalize.culture().calendars.standard.convert.toGregorian(this.selectedYear, this.selectedMonth - 1, this.selectedDay);
+                else
+                    var d = (new Date(this.selectedYear, this.selectedMonth - 1, this.selectedDay));
+                if (this.dateFormat)
+                    return Globalize.format(d, this.dateFormat);
+                else
+                    return Globalize.format(d, "D");
+            },
+            enumerable: true,
+            configurable: true
+        });
 
-        get selectedDate(): string {
-            if (this.selectedDay == null && this.selectedMonth == null && this.selectedYear == null)
-                return null;
-            if (Globalize.culture().calendars.standard.convert)
-                var d = Globalize.culture().calendars.standard.convert.toGregorian(this.selectedYear, this.selectedMonth - 1, this.selectedDay);
-            else
-                var d = <any>(new Date(this.selectedYear, this.selectedMonth - 1, this.selectedDay));
-            if (this.dateFormat)
-                return Globalize.format(d, this.dateFormat);
-            else
-                return Globalize.format(d, "D");
-        }
-
-        changeSelectedDate(date: string) {
+        Model.prototype.changeSelectedDate = function (date) {
             if (date) {
                 var d;
                 if (this.dateFormat)
@@ -158,52 +186,41 @@ module DatePicker {
                 this.selectedMonth = null;
                 this.selectedYear = null;
             }
+        };
+
+        Object.defineProperty(Model.prototype, "viewingMonth", {
+            get: function () {
+                return this._viewingMonth;
+            },
+            set: function (value) {
+                if (value == 0) {
+                    this._viewingMonth = 12;
+                    this.viewingYear--;
+                } else if (value == 13) {
+                    this._viewingMonth = 1;
+                    this.viewingYear++;
+                } else
+                    this._viewingMonth = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Model;
+    })();
+    DatePicker.Model = Model;
+
+    var Widget = (function () {
+        function Widget(input, model, options) {
+            this.input = input;
+            this.model = model;
+            this.options = options;
         }
+        Widget.prototype.init = function () {
+            this.dayViewElm = $('<div class="dorna-datepicker-days"></div>');
+            this.monthViewElm = $('<div class="dorna-datepicker-months"></div>');
+            this.yearViewElm = $('<div class="dorna-datepicker-years"></div>');
 
-        viewingDecade: number;
-        viewingYear: number;
-
-        _viewingMonth: number;
-        set viewingMonth(value: number) {
-            if (value == 0) {
-                this._viewingMonth = 12;
-                this.viewingYear--;
-            }
-            else if (value == 13) {
-                this._viewingMonth = 1;
-                this.viewingYear++;
-            }
-            else
-                this._viewingMonth = value;
-        }
-        get viewingMonth() { return this._viewingMonth; }
-
-        constructor (public culture: GlobalizeCulture, public dateFormat?: string) {
-            var date = new Date();
-            this.selectedYear = this.viewingYear = parseInt(Globalize.format(date, "yyyy"));
-            this.selectedMonth = this.viewingMonth = parseInt(Globalize.format(date, "MM"));
-            this.selectedDay = parseInt(Globalize.format(date, "dd"));
-            this.viewingDecade = this.viewingYear - (this.viewingYear % 10);
-            this.viewMode = 1;
-        }
-    }
-
-    export class Widget {
-        dayViewElm: JQuery;
-        monthViewElm: JQuery;
-        yearViewElm: JQuery;
-        elm: JQuery;
-        pickerBtn: JQuery;
-
-        constructor (public input: JQuery, public model: Model, public options: Options) {
-        }
-
-        init() {
-            this.dayViewElm = $('<div class="datepicker-days"></div>');
-            this.monthViewElm = $('<div class="datepicker-months"></div>');
-            this.yearViewElm = $('<div class="datepicker-years"></div>');
-
-            this.elm = $('<div class="datepicker dropdown-menu"></div>');
+            this.elm = $('<div class="dorna-datepicker dropdown-menu"></div>');
             this.input.parent().prepend(this.elm);
             this.pickerBtn = this.input.siblings("span");
 
@@ -228,12 +245,11 @@ module DatePicker {
             });
 
             $(document).on("mousedown", function (e) {
-                var targetElm = $(e.target).closest(".datepicker-inline, .datepicker.dropdown-menu");
+                var targetElm = $(e.target).closest(".datepicker-inline, .dorna-datepicker.dropdown-menu");
                 if (targetElm.length === 0) {
                     widget.removePicker();
                     //widget.elm.fadeOut();
-                }
-                else if (!(widget.input.is(targetElm) || widget.elm.is(targetElm))) {
+                } else if (!(widget.input.is(targetElm) || widget.elm.is(targetElm))) {
                     widget.removePicker();
                     //widget.elm.fadeOut();
                 }
@@ -243,9 +259,9 @@ module DatePicker {
             this.elm.append(this.monthViewElm);
             this.elm.append(this.yearViewElm);
             this.renderView();
-        }
+        };
 
-        renderView() {
+        Widget.prototype.renderView = function () {
             this.detachEventhandlers();
             this.initializeViews();
             switch (this.model.viewMode) {
@@ -263,26 +279,26 @@ module DatePicker {
                     break;
             }
             this.attachEventHandlers();
-        }
+        };
 
-        initializeViews() {
+        Widget.prototype.initializeViews = function () {
             this.dayViewElm.hide();
             this.dayViewElm.empty();
             this.monthViewElm.hide();
             this.monthViewElm.empty();
             this.yearViewElm.hide();
             this.yearViewElm.empty();
-        }
+        };
 
-        placePicker() {
+        Widget.prototype.placePicker = function () {
             this.elm.addClass('open');
-        }
+        };
 
-        removePicker() {
+        Widget.prototype.removePicker = function () {
             this.elm.removeClass('open');
-        }
+        };
 
-        renderDayView() {
+        Widget.prototype.renderDayView = function () {
             var table = $('<table></table>');
             var tHead = $("<thead></thead>");
             var tBody = $("<tbody></tbody>");
@@ -292,8 +308,7 @@ module DatePicker {
                 navigationRow.append($('<th><i class="icon-arrow-left"></th>').addClass("prev"));
                 navigationRow.append($("<th></th>").attr("colspan", 5).addClass("switch").text(this.model.yearMonthHeader));
                 navigationRow.append($('<th><i class="icon-arrow-right"></th>').addClass("next"));
-            }
-            else {
+            } else {
                 navigationRow.append($('<th><i class="icon-arrow-right"></th>').addClass("prev"));
                 navigationRow.append($("<th></th>").attr("colspan", 5).addClass("switch").text(this.model.yearMonthHeader));
                 navigationRow.append($('<th><i class="icon-arrow-left"></th>').addClass("next"));
@@ -307,26 +322,31 @@ module DatePicker {
             }
             tHead.append(dowRow);
             table.append(tHead);
-
+            var dayViewDays = this.model.dayViewDays;
             for (var i = 0; i < 6; i++) {
                 var tr = $("<tr></tr>");
                 for (var j = 0; j < 7; j++) {
                     var td = $("<td></td>").addClass("day");
-                    if (this.model.dayViewDays[i][j].isOld) td.addClass("old");
-                    if (this.model.dayViewDays[i][j].isActive) td.addClass("active");
-                    if (this.model.dayViewDays[i][j].isToday) td.addClass("today");
-                    if (this.model.dayViewDays[i][j].isNew) td.addClass("new");
-                    if (this.model.dayViewDays[i][j].isDisabled) td.addClass("disabled");
-                    td.text(this.model.dayViewDays[i][j].value);
+                    if (dayViewDays[i][j].isOld)
+                        td.addClass("old");
+                    if (dayViewDays[i][j].isActive)
+                        td.addClass("active");
+                    if (dayViewDays[i][j].isToday)
+                        td.addClass("today");
+                    if (dayViewDays[i][j].isNew)
+                        td.addClass("new");
+                    if (dayViewDays[i][j].isDisabled)
+                        td.addClass("disabled");
+                    td.text(dayViewDays[i][j].value);
                     tr.append(td);
                 }
                 tBody.append(tr);
             }
             table.append(tBody);
             this.dayViewElm.append(table);
-        }
+        };
 
-        renderMonthView() {
+        Widget.prototype.renderMonthView = function () {
             var table = $('<table class="table-condensed"></table>');
             var tHead = $("<thead></thead>");
             var tBody = $("<tbody></tbody>");
@@ -336,8 +356,7 @@ module DatePicker {
                 navigationRow.append($('<th><i class="icon-arrow-left"></th>').addClass("prev"));
                 navigationRow.append($("<th></th>").attr("colspan", 5).addClass("switch").text(this.model.yearHeader));
                 navigationRow.append($('<th><i class="icon-arrow-right"></i></th>').addClass("next"));
-            }
-            else {
+            } else {
                 navigationRow.append($('<th><i class="icon-arrow-right"></i></th>').addClass("prev"));
                 navigationRow.append($("<th></th>").attr("colspan", 5).addClass("switch").text(this.model.yearHeader));
                 navigationRow.append($('<th><i class="icon-arrow-left"></i></th>').addClass("next"));
@@ -354,8 +373,10 @@ module DatePicker {
                 for (var c = 0; c < 3; c++) {
                     var mTd = $('<td class="month"></td>');
                     var monthIndex = r * 3 + c;
-                    if (this.model.monthViewMonths[monthIndex].isActive) mTd.addClass("active");
-                    if (this.model.monthViewMonths[monthIndex].isDisabled) mTd.addClass("disabled");
+                    if (this.model.monthViewMonths[monthIndex].isActive)
+                        mTd.addClass("active");
+                    if (this.model.monthViewMonths[monthIndex].isDisabled)
+                        mTd.addClass("disabled");
                     mTd.text(this.model.monthViewMonths[monthIndex].value);
                     mTd.data("month", monthIndex.toString());
                     mTr.append(mTd);
@@ -369,9 +390,9 @@ module DatePicker {
             tBody.append(monthsRow);
             table.append(tBody);
             this.monthViewElm.append(table);
-        }
+        };
 
-        renderYearView() {
+        Widget.prototype.renderYearView = function () {
             var table = $("<table></table>").addClass("table-condensed");
             var tHead = $("<thead></thead>");
             var tBody = $("<tbody></tbody>");
@@ -381,8 +402,7 @@ module DatePicker {
                 navigationRow.append($('<th><i class="icon-arrow-left"></i></th>').addClass("prev"));
                 navigationRow.append($("<th></th>").attr("colspan", 5).addClass("switch").text(this.model.decadeHeader));
                 navigationRow.append($('<th><i class="icon-arrow-right"></i></th>').addClass("next"));
-            }
-            else {
+            } else {
                 navigationRow.append($('<th><i class="icon-arrow-right"></i></th>').addClass("prev"));
                 navigationRow.append($("<th></th>").attr("colspan", 5).addClass("switch").text(this.model.decadeHeader));
                 navigationRow.append($('<th><i class="icon-arrow-left"></i></th>').addClass("next"));
@@ -398,8 +418,10 @@ module DatePicker {
                 for (var c = 0; c < 3; c++) {
                     var yTd = $('<td class="year"></td>');
                     var yearIndex = r * 3 + c;
-                    if (this.model.yearViewYears[yearIndex].isActive) yTd.addClass("active");
-                    if (this.model.yearViewYears[yearIndex].isDisabled) yTd.addClass("disabled");
+                    if (this.model.yearViewYears[yearIndex].isActive)
+                        yTd.addClass("active");
+                    if (this.model.yearViewYears[yearIndex].isDisabled)
+                        yTd.addClass("disabled");
                     yTd.text(this.model.yearViewYears[yearIndex].value);
                     yTr.append(yTd);
                 }
@@ -412,9 +434,9 @@ module DatePicker {
             tBody.append(yearsRow);
             table.append(tBody);
             this.yearViewElm.append(table);
-        }
+        };
 
-        attachEventHandlers() {
+        Widget.prototype.attachEventHandlers = function () {
             var widget = this;
             this.elm.find(".next").on("click", function (e) {
                 switch (widget.model.viewMode) {
@@ -490,9 +512,9 @@ module DatePicker {
                 this.pickerBtn.on("click", function () {
                     widget.placePicker();
                 });
-        }
+        };
 
-        detachEventhandlers() {
+        Widget.prototype.detachEventhandlers = function () {
             this.elm.find(".next").off("click");
             this.elm.find(".prev").off("click");
             this.elm.find(".day").off("click");
@@ -501,7 +523,9 @@ module DatePicker {
             this.elm.find(".switch").off("click");
             if (this.pickerBtn != null)
                 this.pickerBtn.off("click");
-        }
-    }
-
-}
+        };
+        return Widget;
+    })();
+    DatePicker.Widget = Widget;
+})(DatePicker || (DatePicker = {}));
+//# sourceMappingURL=DatePicker.js.map

@@ -1,0 +1,108 @@
+﻿.datepicker-group {
+    position: relative;
+}
+
+.dorna-datepicker {
+    width: 220px;
+    padding: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.dorna-datepicker.dropdown-menu.open {
+    display: inline-block;
+}
+
+    .dorna-datepicker table {
+        width: 100%;
+        margin: 0;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+        .dorna-datepicker table th {
+            height: 28px;
+            padding: 0;
+        }
+
+    .dorna-datepicker th.prev,
+    .dorna-datepicker th.next {
+        width: 31px;
+    }
+
+    .dorna-datepicker td.old,
+    .dorna-datepicker td.new {
+        color: #999999;
+    }
+
+.dorna-datepicker-days td {
+    height: 28px;
+    width: 30px;
+    padding: 0;
+}
+
+.dorna-datepicker-months td,
+.dorna-datepicker-years td {
+    height: 49px;
+    width: 56px;
+    padding: 0;
+}
+.dorna-datepicker * {
+    text-align: center;
+}
+
+
+
+
+.dorna-datepicker .day:hover,
+.dorna-datepicker .month:hover,
+.dorna-datepicker .year:hover,
+.dorna-datepicker .switch:hover,
+.dorna-datepicker .next:hover,
+.dorna-datepicker .prev:hover {
+    background-color: #eeeeee;
+    -ms-border-radius: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.dorna-datepicker td, .dorna-datepicker th {
+    min-width: 30px !important;
+}
+
+.dorna-datepicker td.active {
+    color: #ffffff;
+    background-color: #006dcc;
+    background-image: -moz-linear-gradient(top, #0088cc, #0044cc);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#0088cc), to(#0044cc));
+    background-image: -webkit-linear-gradient(top, #0088cc, #0044cc);
+    background-image: -o-linear-gradient(top, #0088cc, #0044cc);
+    background-image: linear-gradient(to bottom, #0088cc, #0044cc);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0044cc', GradientType=0);
+    border-color: #0044cc #0044cc #002a80;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    *background-color: #0044cc;
+    -webkit-text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    -ms-text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+    -ms-border-radius: 4px;
+    border-radius: 4px;
+}
+.dorna-datepicker td.active:hover {
+    background-color: #0044cc;
+}
+
+.dorna-datepicker td.today {
+    background-color: darkgray;
+    -ms-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.datepicker-inline + span {
+    cursor: pointer;
+}
+.datepicker-group input.datepicker-inline {
+    direction: ltr;
+}
