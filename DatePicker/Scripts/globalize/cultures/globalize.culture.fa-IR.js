@@ -32,10 +32,10 @@
         language: "fa",
         isRTL: true,
         numberFormat: {
-            pattern: ["n-"],
+            pattern: ["-n"],
             currency: {
-                pattern: ["$n-", "$ n"],
-                ".": "/",
+                pattern: ["-n $", "n $"],
+                ".": ".",
                 symbol: "ريال"
             }
         },
