@@ -1,4 +1,4 @@
-﻿// TODO: create a method for set date
+// TODO: create a method for set date
 // TODO: create a method for hiding
 // TODO: create a method for showing
 
@@ -26,6 +26,7 @@ module DatePicker {
     export interface Options {
         onSelect: (dateText: string) => void;
         dateFormat: string;
+
         //PickerBtnQuery: JQuery;
     }
 
@@ -219,6 +220,12 @@ module DatePicker {
                     if (widget.options.onSelect != null)
                         widget.options.onSelect(widget.model.selectedDate);
                 }
+            });
+
+            this.input.focusout(() => {
+                widget.removePicker();
+      
+               
             });
 
             $(window).on("resize", function () {
